@@ -1,0 +1,6 @@
+{
+  "name": "이 법, 괜찮은가요? - 쉬운 사건으로 이해하는 기본권 제한과 헌법",
+  "description": "고등학교 1학년 통합사회2: 쉬운 사건으로 이해하는 기본권 제한의 요건, 과잉금지원칙, 권력분립 6대 상호견제, 인권보장 제도 및 헌법재판소 기본권 구제 50분 인터랙티브 수업 웹앱",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
