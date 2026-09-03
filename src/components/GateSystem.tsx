@@ -1,13 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Shield, Lock, Unlock, CheckCircle2, XCircle, ArrowRight, Sparkles, Scale, AlertTriangle } from 'lucide-react';
 
 interface GateSystemProps {
-  initialGate?: number;
+  currentGateIndex?: number;
+  onGateChange?: (newIndex: number) => void;
   onAllGatesPassed?: () => void;
 }
 
-export const GateSystem: React.FC<GateSystemProps> = ({ initialGate = 1, onAllGatesPassed }) => {
-  const [activeGate, setActiveGate] = useState<number>(initialGate);
+export const GateSystem: React.FC<GateSystemProps> = ({
+  currentGateIndex = 0,
+  onGateChange,
+  onAllGatesPassed,
+}) => {
+  const [activeGate, setActiveGate] = useState<number>(currentGateIndex + 1);
   const [gate1Status, setGate1Status] = useState<'locked' | 'unlocked'>('locked');
   const [gate2Status, setGate2Status] = useState<'locked' | 'unlocked'>('locked');
   const [gate3Status, setGate3Status] = useState<'locked' | 'unlocked'>('locked');
@@ -20,6 +25,33 @@ export const GateSystem: React.FC<GateSystemProps> = ({ initialGate = 1, onAllGa
   const [gate1Checked, setGate1Checked] = useState<boolean>(false);
   const [gate2Checked, setGate2Checked] = useState<boolean>(false);
   const [gate3Checked, setGate3Checked] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (currentGateIndex !== undefined) {
+      if (currentGateIndex === 0) {
+        setActiveGate(1);
+      } else if (currentGateIndex === 1) {
+        setActiveGate(2);
+        setGate1Status('unlocked');
+      } else if (currentGateIndex === 2) {
+        setActiveGate(3);
+        setGate1Status('unlocked');
+        setGate2Status('unlocked');
+      } else if (currentGateIndex >= 3) {
+        setActiveGate(4);
+        setGate1Status('unlocked');
+        setGate2Status('unlocked');
+        setGate3Status('unlocked');
+      }
+    }
+  }, [currentGateIndex]);
+
+  const handleSwitchGate = (gateNum: number) => {
+    setActiveGate(gateNum);
+    if (onGateChange) {
+      onGateChange(Math.min(gateNum - 1, 3));
+    }
+  };
 
   const handleGate1Verify = () => {
     if (!gate1Answer) return;
@@ -82,7 +114,7 @@ export const GateSystem: React.FC<GateSystemProps> = ({ initialGate = 1, onAllGa
           <div className="grid grid-cols-3 gap-2 sm:gap-4 relative z-10">
             {/* GATE 1 */}
             <button
-              onClick={() => setActiveGate(1)}
+              onClick={() => handleSwitchGate(1)}
               className={`p-3 sm:p-4 rounded-2xl border-2 transition-all text-left flex flex-col items-center sm:items-start justify-between gap-2 cursor-pointer ${
                 activeGate === 1
                   ? 'border-amber-400 bg-amber-950/40 ring-2 ring-amber-400/20 shadow-lg'
@@ -118,7 +150,7 @@ export const GateSystem: React.FC<GateSystemProps> = ({ initialGate = 1, onAllGa
 
             {/* GATE 2 */}
             <button
-              onClick={() => setActiveGate(2)}
+              onClick={() => handleSwitchGate(2)}
               className={`p-3 sm:p-4 rounded-2xl border-2 transition-all text-left flex flex-col items-center sm:items-start justify-between gap-2 cursor-pointer ${
                 activeGate === 2
                   ? 'border-sky-400 bg-sky-950/40 ring-2 ring-sky-400/20 shadow-lg'
@@ -154,7 +186,7 @@ export const GateSystem: React.FC<GateSystemProps> = ({ initialGate = 1, onAllGa
 
             {/* GATE 3 */}
             <button
-              onClick={() => setActiveGate(3)}
+              onClick={() => handleSwitchGate(3)}
               className={`p-3 sm:p-4 rounded-2xl border-2 transition-all text-left flex flex-col items-center sm:items-start justify-between gap-2 cursor-pointer ${
                 activeGate === 3
                   ? 'border-rose-400 bg-rose-950/40 ring-2 ring-rose-400/20 shadow-lg'
@@ -307,7 +339,7 @@ export const GateSystem: React.FC<GateSystemProps> = ({ initialGate = 1, onAllGa
                     💡 기억 공식: “왜 막아? ➔ 안·질·공!”
                   </span>
                   <button
-                    onClick={() => setActiveGate(2)}
+                    onClick={() => handleSwitchGate(2)}
                     className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs transition-all shadow-xs cursor-pointer flex items-center gap-1"
                   >
                     <span>다음 GATE 2로 이동</span>
@@ -415,7 +447,7 @@ export const GateSystem: React.FC<GateSystemProps> = ({ initialGate = 1, onAllGa
                     💡 기억 공식: “무엇으로 막아? ➔ 오직 국회의 ‘법률’로!”
                   </span>
                   <button
-                    onClick={() => setActiveGate(3)}
+                    onClick={() => handleSwitchGate(3)}
                     className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs transition-all shadow-xs cursor-pointer flex items-center gap-1"
                   >
                     <span>다음 GATE 3으로 이동</span>
@@ -518,8 +550,17 @@ export const GateSystem: React.FC<GateSystemProps> = ({ initialGate = 1, onAllGa
                 <p className="text-xs sm:text-sm text-slate-800 leading-relaxed font-medium">
                   국회가 법률을 제정하더라도 그 권리의 본질적인 알맹이(생명, 표현의 본질, 최소한의 인간다운 생활 등)를 없애거나 불가능하게 만들면 헌법에 위반됩니다.
                 </p>
-                <div className="p-3 bg-amber-50 rounded-xl border border-amber-200 text-xs text-amber-950 font-bold">
-                  💡 기억 공식: “어디까지 막아? ➔ ‘본질적 내용’은 절대 손댈 수 없다!”
+                <div className="flex justify-between items-center pt-2">
+                  <span className="text-xs text-amber-900 font-bold bg-amber-100/80 px-3 py-1 rounded-lg">
+                    💡 기억 공식: “어디까지 막아? ➔ ‘본질적 내용’은 절대 손댈 수 없다!”
+                  </span>
+                  <button
+                    onClick={() => handleSwitchGate(4)}
+                    className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs transition-all shadow-xs cursor-pointer flex items-center gap-1"
+                  >
+                    <span>3대 GATE 종합 조문 확인</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </button>
                 </div>
               </div>
             )}

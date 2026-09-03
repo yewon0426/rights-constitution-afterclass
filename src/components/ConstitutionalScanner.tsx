@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Scan, ShieldAlert, CheckCircle2, XCircle, AlertTriangle, Play, Sparkles, Scale, RefreshCw } from 'lucide-react';
+import { Scan, ShieldAlert, CheckCircle2, XCircle, AlertTriangle, Play, Sparkles, Scale, RefreshCw, ArrowRight } from 'lucide-react';
 
 interface ScanItem {
   id: number;
@@ -9,6 +9,11 @@ interface ScanItem {
   resultText: string;
   detail: string;
   mnemonic: string;
+}
+
+interface ConstitutionalScannerProps {
+  initialScannedStep?: number;
+  onNext?: () => void;
 }
 
 const SCAN_STEPS: ScanItem[] = [
@@ -50,8 +55,11 @@ const SCAN_STEPS: ScanItem[] = [
   },
 ];
 
-export const ConstitutionalScanner: React.FC = () => {
-  const [scannedStep, setScannedStep] = useState<number>(0);
+export const ConstitutionalScanner: React.FC<ConstitutionalScannerProps> = ({
+  initialScannedStep = 0,
+  onNext,
+}) => {
+  const [scannedStep, setScannedStep] = useState<number>(initialScannedStep);
   const [isScanning, setIsScanning] = useState<boolean>(false);
 
   const handleScanNext = () => {
@@ -263,6 +271,18 @@ export const ConstitutionalScanner: React.FC = () => {
                 🌟 <strong>헌법 수능·내신 절대 원칙:</strong> 과잉금지원칙 4단계 중 <strong>단 하나라도 위반하면 전체가 위헌</strong>이 됩니다!
               </span>
             </div>
+
+            {onNext && (
+              <div className="flex justify-end pt-2">
+                <button
+                  onClick={onNext}
+                  className="px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-black text-xs sm:text-sm transition-all shadow-lg flex items-center gap-1.5 cursor-pointer"
+                >
+                  <span>다음 심층 분석으로 이동</span>
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              </div>
+            )}
           </div>
         )}
       </div>

@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Landmark, Vote, Scale, Users, Shield, Sparkles, CheckCircle2, ChevronDown, ChevronUp } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Landmark, Vote, Scale, Users, Shield, Sparkles, CheckCircle2, ChevronDown, ChevronUp, ArrowRight } from 'lucide-react';
 
 interface PillarItem {
   id: number;
@@ -55,9 +55,36 @@ const PILLARS: PillarItem[] = [
   },
 ];
 
-export const ConstitutionalPillars: React.FC = () => {
-  const [activePillar, setActivePillar] = useState<number>(1);
+interface ConstitutionalPillarsProps {
+  currentPillarIndex?: number;
+  onPillarChange?: (idx: number) => void;
+}
+
+export const ConstitutionalPillars: React.FC<ConstitutionalPillarsProps> = ({
+  currentPillarIndex = 0,
+  onPillarChange,
+}) => {
+  const [activePillar, setActivePillar] = useState<number>(currentPillarIndex + 1);
   const [showFormalVsSubstantive, setShowFormalVsSubstantive] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (currentPillarIndex !== undefined) {
+      setActivePillar(Math.min(Math.max(currentPillarIndex + 1, 1), 4));
+    }
+  }, [currentPillarIndex]);
+
+  const handleSelectPillar = (id: number) => {
+    setActivePillar(id);
+    if (onPillarChange) {
+      onPillarChange(id - 1);
+    }
+  };
+
+  const handleNextPillar = () => {
+    if (activePillar < 4) {
+      handleSelectPillar(activePillar + 1);
+    }
+  };
 
   return (
     <div className="space-y-6 animate-fadeIn">
@@ -123,7 +150,7 @@ export const ConstitutionalPillars: React.FC = () => {
           return (
             <button
               key={p.id}
-              onClick={() => setActivePillar(p.id)}
+              onClick={() => handleSelectPillar(p.id)}
               className={`p-5 rounded-3xl border-2 text-left transition-all cursor-pointer flex flex-col justify-between space-y-4 ${
                 isSelected
                   ? 'border-slate-900 bg-slate-900 text-white shadow-xl -translate-y-1'
@@ -208,6 +235,23 @@ export const ConstitutionalPillars: React.FC = () => {
               <p className="text-slate-900 font-bold">
                 {selected.examPoint}
               </p>
+            </div>
+
+            <div className="flex justify-end pt-2">
+              {activePillar < 4 ? (
+                <button
+                  onClick={handleNextPillar}
+                  className="px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs sm:text-sm transition-all shadow-sm flex items-center gap-1.5 cursor-pointer"
+                >
+                  <span>다음 헌법 기둥 확인 (0{activePillar + 1}번)</span>
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              ) : (
+                <div className="text-xs text-emerald-600 font-bold flex items-center gap-1">
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span>4대 기둥 학습 완료! 하단 [다음] 버튼을 눌러 헌법재판소 노선도로 이동하세요.</span>
+                </div>
+              )}
             </div>
           </div>
         );

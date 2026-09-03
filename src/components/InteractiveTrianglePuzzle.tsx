@@ -1,14 +1,30 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Landmark, Building2, Gavel, Sparkles, CheckCircle2, ShieldCheck, ArrowRight, RotateCcw, AlertCircle } from 'lucide-react';
 import { POWER_CHECKS } from '../data/curriculum';
 
-export const InteractiveTrianglePuzzle: React.FC = () => {
-  const [solvedChecks, setSolvedChecks] = useState<number[]>([1]); // start with #1 active/discovered or user can click
-  const [activeCheckId, setActiveCheckId] = useState<number>(1);
+interface InteractiveTrianglePuzzleProps {
+  currentCheckIndex?: number;
+  onCheckChange?: (newIndex: number) => void;
+}
+
+export const InteractiveTrianglePuzzle: React.FC<InteractiveTrianglePuzzleProps> = ({
+  currentCheckIndex = 0,
+  onCheckChange,
+}) => {
+  const [solvedChecks, setSolvedChecks] = useState<number[]>([1]); // start with #1 active
+  const [activeCheckId, setActiveCheckId] = useState<number>(currentCheckIndex + 1);
   const [userSelection, setUserSelection] = useState<string | null>(null);
   const [isAnswered, setIsAnswered] = useState<boolean>(false);
 
-  const activeCheck = POWER_CHECKS.find((c) => c.id === activeCheckId) || POWER_CHECKS[0];
+  // Sync activeCheckId whenever currentCheckIndex changes from parent/Footer
+  useEffect(() => {
+    const targetId = Math.min(Math.max(currentCheckIndex + 1, 1), 6);
+    setActiveCheckId(targetId);
+    setUserSelection(null);
+    setIsAnswered(solvedChecks.includes(targetId));
+  }, [currentCheckIndex]);
+
+  const activeCheck = POWER_CHECKS[activeCheckId - 1] || POWER_CHECKS[0];
 
   const handleSelectOption = (optId: string) => {
     if (!isAnswered) {
@@ -29,12 +45,18 @@ export const InteractiveTrianglePuzzle: React.FC = () => {
     setActiveCheckId(nextId);
     setUserSelection(null);
     setIsAnswered(solvedChecks.includes(nextId));
+    if (onCheckChange) {
+      onCheckChange(nextId - 1);
+    }
   };
 
   const handleQuickJump = (id: number) => {
     setActiveCheckId(id);
     setUserSelection(null);
     setIsAnswered(solvedChecks.includes(id));
+    if (onCheckChange) {
+      onCheckChange(id - 1);
+    }
   };
 
   const handleSolveAll = () => {
@@ -320,7 +342,7 @@ export const InteractiveTrianglePuzzle: React.FC = () => {
         {/* Quick Check Selection Pills */}
         <div className="w-full flex items-center justify-between gap-1.5 pt-4 border-t border-slate-800 flex-wrap">
           {POWER_CHECKS.map((c, idx) => {
-            const isSolved = solvedChecks.includes(c.id);
+            const isSolved = solvedChecks.includes(idx + 1);
             const isCurrent = activeCheckId === idx + 1;
             return (
               <button

@@ -3,9 +3,10 @@ import { Radio, MessageCircle, Heart, Share2, AlertCircle, Sparkles, CheckCircle
 
 interface SocialNewsFeedProps {
   onOptionSelected?: (optionId: string) => void;
+  onNext?: () => void;
 }
 
-export const SocialNewsFeed: React.FC<SocialNewsFeedProps> = ({ onOptionSelected }) => {
+export const SocialNewsFeed: React.FC<SocialNewsFeedProps> = ({ onOptionSelected, onNext }) => {
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [isAnswered, setIsAnswered] = useState<boolean>(false);
   const [liked, setLiked] = useState<boolean>(false);
@@ -264,6 +265,18 @@ export const SocialNewsFeed: React.FC<SocialNewsFeedProps> = ({ onOptionSelected
                 국가는 국민의 자유를 <span className="text-indigo-600">‘왜’</span>, <span className="text-amber-600">‘무엇으로’</span>, <span className="text-rose-600">‘어디까지’</span> 제한할 수 있을까요?
               </p>
             </div>
+
+            {onNext && (
+              <div className="flex justify-end pt-2">
+                <button
+                  onClick={onNext}
+                  className="px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs sm:text-sm transition-all shadow-md flex items-center gap-1.5 cursor-pointer"
+                >
+                  <span>1단계: 기본권 제한 3대 GATE 통과하기</span>
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              </div>
+            )}
           </div>
         )}
       </div>

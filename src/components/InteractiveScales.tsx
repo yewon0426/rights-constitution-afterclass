@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
 import { Scale, Sparkles, AlertTriangle, ArrowRight, HelpCircle, CheckCircle2, Bookmark, ChevronDown, ChevronUp } from 'lucide-react';
 
-export const InteractiveScales: React.FC = () => {
+interface InteractiveScalesProps {
+  onNext?: () => void;
+}
+
+export const InteractiveScales: React.FC<InteractiveScalesProps> = ({ onNext }) => {
   const [scalePosition, setScalePosition] = useState<'neutral' | 'tilted'>('neutral');
   const [userChoice, setUserChoice] = useState<'balanced' | 'unbalanced' | null>(null);
   const [isChecked, setIsChecked] = useState<boolean>(false);
@@ -223,6 +227,18 @@ export const InteractiveScales: React.FC = () => {
             <div className="p-3.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-950 text-xs font-bold">
               💡 기억 공식: “얻는 것보다 잃는 게 너무 크지 않아? ➔ 법익의 균형성!”
             </div>
+
+            {onNext && (
+              <div className="flex justify-end pt-2">
+                <button
+                  onClick={onNext}
+                  className="px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs sm:text-sm transition-all shadow-md flex items-center gap-1.5 cursor-pointer"
+                >
+                  <span>과잉금지원칙 4단계 최종 결론 확인</span>
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              </div>
+            )}
           </div>
         )}
       </div>

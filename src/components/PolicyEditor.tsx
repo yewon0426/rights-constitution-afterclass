@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
 import { FileCode2, Check, AlertTriangle, Sparkles, CheckCircle2, RotateCcw, Award, ArrowRight } from 'lucide-react';
 
-export const PolicyEditor: React.FC = () => {
+interface PolicyEditorProps {
+  onNext?: () => void;
+}
+
+export const PolicyEditor: React.FC<PolicyEditorProps> = ({ onNext }) => {
   const [selectedRevision, setSelectedRevision] = useState<'a' | 'b' | null>(null);
   const [isApplied, setIsApplied] = useState<boolean>(false);
 
@@ -189,18 +193,30 @@ export const PolicyEditor: React.FC = () => {
             </button>
           ) : <div />}
 
-          <button
-            onClick={handleApply}
-            disabled={!selectedRevision}
-            className={`px-7 py-3 rounded-2xl font-black text-sm sm:text-base transition-all shadow-sm flex items-center gap-1.5 ${
-              selectedRevision
-                ? 'bg-indigo-600 text-white hover:bg-indigo-700 cursor-pointer active:scale-95 shadow-indigo-200'
-                : 'bg-slate-200 text-slate-400 cursor-not-allowed'
-            }`}
-          >
-            <span>에디터에 수정안 적용</span>
-            <ArrowRight className="w-4 h-4" />
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleApply}
+              disabled={!selectedRevision}
+              className={`px-7 py-3 rounded-2xl font-black text-sm sm:text-base transition-all shadow-sm flex items-center gap-1.5 ${
+                selectedRevision
+                  ? 'bg-indigo-600 text-white hover:bg-indigo-700 cursor-pointer active:scale-95 shadow-indigo-200'
+                  : 'bg-slate-200 text-slate-400 cursor-not-allowed'
+              }`}
+            >
+              <span>에디터에 수정안 적용</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
+
+            {isApplied && selectedRevision === 'a' && onNext && (
+              <button
+                onClick={onNext}
+                className="px-6 py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-sm sm:text-base transition-all shadow-md flex items-center gap-1.5 cursor-pointer animate-fadeIn"
+              >
+                <span>실제 헌재 판례 비교 확인</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </div>

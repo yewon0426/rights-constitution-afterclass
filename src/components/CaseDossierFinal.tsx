@@ -1,22 +1,38 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Folder, FileText, Award, ShieldCheck, CheckCircle2, Stamp, Sparkles, Printer, RotateCcw, ArrowRight } from 'lucide-react';
 
 interface CaseDossierFinalProps {
+  currentTabStep?: number;
+  onTabChange?: (tabStep: number) => void;
   onRestart?: () => void;
 }
 
-export const CaseDossierFinal: React.FC<CaseDossierFinalProps> = ({ onRestart }) => {
+export const CaseDossierFinal: React.FC<CaseDossierFinalProps> = ({ currentTabStep = 0, onTabChange, onRestart }) => {
   const [activeTab, setActiveTab] = useState<'evidence' | 'verdict' | 'certificate'>('evidence');
   const [verdictSelected, setVerdictSelected] = useState<'unconstitutional' | 'constitutional' | null>(null);
   const [isStamped, setIsStamped] = useState<boolean>(false);
   const [studentName, setStudentName] = useState<string>('통합사회 탐정');
+
+  useEffect(() => {
+    if (currentTabStep === 0) setActiveTab('evidence');
+    else if (currentTabStep === 1) setActiveTab('verdict');
+    else if (currentTabStep === 2) setActiveTab('certificate');
+  }, [currentTabStep]);
+
+  const handleTabChange = (tab: 'evidence' | 'verdict' | 'certificate') => {
+    setActiveTab(tab);
+    if (onTabChange) {
+      const idx = tab === 'evidence' ? 0 : tab === 'verdict' ? 1 : 2;
+      onTabChange(idx);
+    }
+  };
 
   const handleApplyStamp = () => {
     if (!verdictSelected) return;
     setIsStamped(true);
     if (verdictSelected === 'unconstitutional') {
       setTimeout(() => {
-        setActiveTab('certificate');
+        handleTabChange('certificate');
       }, 1200);
     }
   };
@@ -49,7 +65,7 @@ export const CaseDossierFinal: React.FC<CaseDossierFinalProps> = ({ onRestart })
           {/* Dossier Tabs */}
           <div className="flex items-center gap-1 bg-[#d5c5aa] p-1.5 rounded-2xl">
             <button
-              onClick={() => setActiveTab('evidence')}
+              onClick={() => handleTabChange('evidence')}
               className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                 activeTab === 'evidence'
                   ? 'bg-slate-900 text-white shadow-xs'
@@ -59,7 +75,7 @@ export const CaseDossierFinal: React.FC<CaseDossierFinalProps> = ({ onRestart })
               📁 증거 서류
             </button>
             <button
-              onClick={() => setActiveTab('verdict')}
+              onClick={() => handleTabChange('verdict')}
               className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                 activeTab === 'verdict'
                   ? 'bg-slate-900 text-white shadow-xs'
@@ -69,7 +85,7 @@ export const CaseDossierFinal: React.FC<CaseDossierFinalProps> = ({ onRestart })
               ⚖️ 최종 판결 선고
             </button>
             <button
-              onClick={() => setActiveTab('certificate')}
+              onClick={() => handleTabChange('certificate')}
               className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                 activeTab === 'certificate'
                   ? 'bg-slate-900 text-white shadow-xs'
@@ -121,7 +137,7 @@ export const CaseDossierFinal: React.FC<CaseDossierFinalProps> = ({ onRestart })
 
             <div className="flex justify-end pt-2">
               <button
-                onClick={() => setActiveTab('verdict')}
+                onClick={() => handleTabChange('verdict')}
                 className="px-6 py-2.5 rounded-xl bg-slate-900 text-white font-black text-xs sm:text-sm hover:bg-slate-800 transition-all shadow-md flex items-center gap-1.5 cursor-pointer"
               >
                 <span>최종 판결문 작성하기</span>
@@ -213,7 +229,7 @@ export const CaseDossierFinal: React.FC<CaseDossierFinalProps> = ({ onRestart })
                 ) : (
                   <div className="flex justify-end pt-2">
                     <button
-                      onClick={() => setActiveTab('certificate')}
+                      onClick={() => handleTabChange('certificate')}
                       className="px-7 py-3 rounded-2xl font-black text-sm bg-slate-900 text-amber-300 hover:bg-slate-800 transition-all shadow-md flex items-center gap-2 cursor-pointer"
                     >
                       <Award className="w-4 h-4" />

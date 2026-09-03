@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Landmark, Train, Sparkles, Scale, CheckCircle2, ChevronRight, BookOpen, AlertCircle, ArrowRight } from 'lucide-react';
 import { COURT_PATHWAYS } from '../data/curriculum';
 
@@ -29,12 +29,40 @@ const LINE_STATIONS: Record<number, MetroStation[]> = {
   ],
 };
 
-export const MetroRouteRemedy: React.FC = () => {
-  const [activeLine, setActiveLine] = useState<number>(1);
+interface MetroRouteRemedyProps {
+  currentPathwayIndex?: number;
+  onPathwayChange?: (idx: number) => void;
+}
+
+export const MetroRouteRemedy: React.FC<MetroRouteRemedyProps> = ({
+  currentPathwayIndex = 0,
+  onPathwayChange,
+}) => {
+  const [activeLine, setActiveLine] = useState<number>(currentPathwayIndex + 1);
   const [selectedStation, setSelectedStation] = useState<number | null>(null);
+
+  useEffect(() => {
+    const targetLine = Math.min(Math.max(currentPathwayIndex + 1, 1), 3);
+    setActiveLine(targetLine);
+    setSelectedStation(null);
+  }, [currentPathwayIndex]);
 
   const currentPathway = COURT_PATHWAYS.find((p) => p.number === activeLine) || COURT_PATHWAYS[0];
   const stations = LINE_STATIONS[activeLine] || LINE_STATIONS[1];
+
+  const handleSelectLine = (lineNum: number) => {
+    setActiveLine(lineNum);
+    setSelectedStation(null);
+    if (onPathwayChange) {
+      onPathwayChange(lineNum - 1);
+    }
+  };
+
+  const handleNextLine = () => {
+    if (activeLine < 3) {
+      handleSelectLine(activeLine + 1);
+    }
+  };
 
   return (
     <div className="space-y-6 animate-fadeIn">
@@ -62,10 +90,7 @@ export const MetroRouteRemedy: React.FC = () => {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         {/* Line 1 */}
         <button
-          onClick={() => {
-            setActiveLine(1);
-            setSelectedStation(null);
-          }}
+          onClick={() => handleSelectLine(1)}
           className={`p-4 rounded-2xl border-2 text-left transition-all cursor-pointer flex items-center justify-between gap-3 ${
             activeLine === 1
               ? 'border-blue-500 bg-blue-950 text-white ring-2 ring-blue-400/30 shadow-lg'
@@ -86,10 +111,7 @@ export const MetroRouteRemedy: React.FC = () => {
 
         {/* Line 2 */}
         <button
-          onClick={() => {
-            setActiveLine(2);
-            setSelectedStation(null);
-          }}
+          onClick={() => handleSelectLine(2)}
           className={`p-4 rounded-2xl border-2 text-left transition-all cursor-pointer flex items-center justify-between gap-3 ${
             activeLine === 2
               ? 'border-emerald-500 bg-emerald-950 text-white ring-2 ring-emerald-400/30 shadow-lg'
@@ -110,10 +132,7 @@ export const MetroRouteRemedy: React.FC = () => {
 
         {/* Line 3 */}
         <button
-          onClick={() => {
-            setActiveLine(3);
-            setSelectedStation(null);
-          }}
+          onClick={() => handleSelectLine(3)}
           className={`p-4 rounded-2xl border-2 text-left transition-all cursor-pointer flex items-center justify-between gap-3 ${
             activeLine === 3
               ? 'border-amber-500 bg-amber-950 text-white ring-2 ring-amber-400/30 shadow-lg'
@@ -218,6 +237,23 @@ export const MetroRouteRemedy: React.FC = () => {
           <div className="p-3 bg-slate-950 rounded-xl border border-slate-800 text-xs text-emerald-400 font-bold flex items-center gap-1.5">
             <CheckCircle2 className="w-4 h-4" />
             <span>기억 공식: {currentPathway.studentMnemonic}</span>
+          </div>
+
+          <div className="flex justify-end pt-2">
+            {activeLine < 3 ? (
+              <button
+                onClick={handleNextLine}
+                className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs sm:text-sm transition-all shadow-sm flex items-center gap-1.5 cursor-pointer"
+              >
+                <span>다음 구제 노선 확인 ({activeLine + 1}호선)</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            ) : (
+              <div className="text-xs text-emerald-400 font-bold flex items-center gap-1">
+                <CheckCircle2 className="w-4 h-4" />
+                <span>3개 노선 학습 완료! 하단 [다음] 버튼을 눌러 FINAL CASE로 이동하세요.</span>
+              </div>
+            )}
           </div>
         </div>
       </div>

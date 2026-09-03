@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
 import { Users, ShieldAlert, Sparkles, XCircle, CheckCircle2, AlertOctagon, HelpCircle, ArrowRight, ChevronDown, ChevronUp } from 'lucide-react';
 
-export const SplitVsComparison: React.FC = () => {
+interface SplitVsComparisonProps {
+  onNext?: () => void;
+}
+
+export const SplitVsComparison: React.FC<SplitVsComparisonProps> = ({ onNext }) => {
   const [selectedChoice, setSelectedChoice] = useState<'both_ban' | 'discriminate' | null>(null);
   const [isAnswered, setIsAnswered] = useState<boolean>(false);
   const [showCaseDetails, setShowCaseDetails] = useState<boolean>(false);
@@ -218,6 +222,18 @@ export const SplitVsComparison: React.FC = () => {
             <div className="p-3.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-950 text-xs font-bold">
               💡 기억 공식: “꼭 이렇게까지 다 막아야 해? ➔ 침해의 최소성!”
             </div>
+
+            {onNext && (
+              <div className="flex justify-end pt-2">
+                <button
+                  onClick={onNext}
+                  className="px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs sm:text-sm transition-all shadow-md flex items-center gap-1.5 cursor-pointer"
+                >
+                  <span>다음: 법익의 균형성 저울 시뮬레이터</span>
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              </div>
+            )}
           </div>
         )}
       </div>

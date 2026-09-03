@@ -81,7 +81,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans selection:bg-indigo-100 selection:text-indigo-900">
+    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans selection:bg-indigo-100 selection:text-indigo-900 overflow-y-auto">
       {/* Top Header */}
       <Header
         currentStageId={currentStageId}
@@ -99,7 +99,7 @@ export default function App() {
         {currentStageId === 'prologue' && (
           <div className="space-y-6">
             {currentStepIndex === 0 && (
-              <SocialNewsFeed />
+              <SocialNewsFeed onNext={handleNext} />
             )}
 
             {currentStepIndex === 1 && (
@@ -151,6 +151,16 @@ export default function App() {
                       </p>
                     </div>
                   </div>
+
+                  <div className="flex justify-end pt-3">
+                    <button
+                      onClick={handleNext}
+                      className="px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs sm:text-sm transition-all shadow-md flex items-center gap-1.5 cursor-pointer"
+                    >
+                      <span>1단계: 기본권 제한 3대 GATE 시작하기</span>
+                      <ArrowRight className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
               </div>
             )}
@@ -163,15 +173,8 @@ export default function App() {
         {currentStageId === 'restriction' && (
           <div className="space-y-6">
             <GateSystem
-              initialGate={
-                currentStepIndex === 0
-                  ? 1
-                  : currentStepIndex === 1
-                  ? 2
-                  : currentStepIndex === 2
-                  ? 3
-                  : 1
-              }
+              currentGateIndex={currentStepIndex}
+              onGateChange={(newIdx) => setCurrentStepIndex(newIdx)}
             />
           </div>
         )}
@@ -181,19 +184,24 @@ export default function App() {
            ========================================================================= */}
         {currentStageId === 'excess_ban' && (
           <div className="space-y-6">
-            {/* Step 0 & 1 & 4: Constitutional Scanner */}
-            {(currentStepIndex === 0 || currentStepIndex === 1 || currentStepIndex === 4) && (
-              <ConstitutionalScanner />
+            {/* Step 0: Constitutional Scanner */}
+            {currentStepIndex === 0 && (
+              <ConstitutionalScanner onNext={handleNext} />
             )}
 
-            {/* Step 2: 좌우 VS 화면 (침해의 최소성) */}
+            {/* Step 1: 좌우 VS 화면 (침해의 최소성) */}
+            {currentStepIndex === 1 && (
+              <SplitVsComparison onNext={handleNext} />
+            )}
+
+            {/* Step 2: 움직이는 물리 저울 UI (법익의 균형성) */}
             {currentStepIndex === 2 && (
-              <SplitVsComparison />
+              <InteractiveScales onNext={handleNext} />
             )}
 
-            {/* Step 3: 움직이는 물리 저울 UI (법익의 균형성) */}
+            {/* Step 3: 과잉금지원칙 4단계 종합 결론 */}
             {currentStepIndex === 3 && (
-              <InteractiveScales />
+              <ConstitutionalScanner initialScannedStep={4} onNext={handleNext} />
             )}
           </div>
         )}
@@ -204,7 +212,7 @@ export default function App() {
         {currentStageId === 'revise_law' && (
           <div className="space-y-6">
             {currentStepIndex === 0 && (
-              <PolicyEditor />
+              <PolicyEditor onNext={handleNext} />
             )}
 
             {currentStepIndex === 1 && (
@@ -257,7 +265,10 @@ export default function App() {
         {currentStageId === 'separation' && (
           <div className="space-y-6">
             {currentStepIndex < 6 && (
-              <InteractiveTrianglePuzzle />
+              <InteractiveTrianglePuzzle
+                currentCheckIndex={currentStepIndex}
+                onCheckChange={(idx) => setCurrentStepIndex(idx)}
+              />
             )}
 
             {currentStepIndex === 6 && (
@@ -318,7 +329,10 @@ export default function App() {
            ========================================================================= */}
         {currentStageId === 'human_rights_systems' && (
           <div className="space-y-6">
-            <ConstitutionalPillars />
+            <ConstitutionalPillars
+              currentPillarIndex={currentStepIndex}
+              onPillarChange={(idx) => setCurrentStepIndex(idx)}
+            />
           </div>
         )}
 
@@ -327,7 +341,10 @@ export default function App() {
            ========================================================================= */}
         {currentStageId === 'court_remedy' && (
           <div className="space-y-6">
-            <MetroRouteRemedy />
+            <MetroRouteRemedy
+              currentPathwayIndex={currentStepIndex}
+              onPathwayChange={(idx) => setCurrentStepIndex(idx)}
+            />
           </div>
         )}
 
@@ -336,7 +353,11 @@ export default function App() {
            ========================================================================= */}
         {currentStageId === 'final_case' && (
           <div className="space-y-6">
-            <CaseDossierFinal onRestart={handleReset} />
+            <CaseDossierFinal
+              currentTabStep={currentStepIndex}
+              onTabChange={(idx) => setCurrentStepIndex(idx)}
+              onRestart={handleReset}
+            />
           </div>
         )}
       </main>
